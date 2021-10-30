@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://ui/default_font.tres" type="DynamicFont" id=1]
+[ext_resource path="res://assets/location/4 Animated objects/Coin.png" type="Texture" id=2]
+[ext_resource path="res://hud/points_counter/PointsCounter.gd" type="Script" id=3]
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 2 )
+region = Rect2( 20, 0, 10, 10 )
+
+[node name="PointsCounter" type="HBoxContainer"]
+margin_right = 50.0
+margin_bottom = 20.0
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_right = 13.0
+margin_bottom = 20.0
+custom_fonts/font = ExtResource( 1 )
+text = "0"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_left = 17.0
+margin_right = 37.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 20, 20 )
+texture = SubResource( 2 )
+expand = true

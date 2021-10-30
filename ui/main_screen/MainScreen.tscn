@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://ui/main_screen/MainScreen.gd" type="Script" id=2]
+
+[node name="MainScreen" type="MarginContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 20
+custom_constants/margin_top = 10
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 10
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 20.0
+margin_top = 10.0
+margin_right = 220.0
+margin_bottom = 246.0
+size_flags_horizontal = 3
+custom_constants/separation = 10
+alignment = 1
+
+[node name="StartBtn" type="Button" parent="VBoxContainer"]
+margin_top = 87.0
+margin_right = 200.0
+margin_bottom = 113.0
+text = "START"
+
+[node name="ExitBtn" type="Button" parent="VBoxContainer"]
+margin_top = 123.0
+margin_right = 200.0
+margin_bottom = 149.0
+text = "exit"
+
+[connection signal="pressed" from="VBoxContainer/StartBtn" to="." method="start_game"]
+[connection signal="pressed" from="VBoxContainer/ExitBtn" to="." method="exit_game"]
