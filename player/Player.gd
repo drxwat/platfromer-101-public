@@ -18,6 +18,16 @@ var push_point = null
 var jump := 0
 var points := 0
 
+# new code
+# accelerate is static and only gravity (but maybe add friction in future)
+var acc_gravity := Vector2.DOWN * 9.8	#typical
+var force_jump := 320.0;
+var _speed_in_air := Vector2.ZERO
+var _speed_on_surface := 100.0;		# speed controlled by the player
+var _speed_left := Vector2.ZERO
+var _speed_right := Vector2.ZERO
+var _speed_total := Vector2.ZERO	# sum all vectors
+
 onready var animated_sprite := $AnimatedSprite
 onready var ray_cast_down := $RayCasDown
 onready var animation_player := $AnimationPlayer
@@ -27,9 +37,7 @@ func _ready() -> void:
 	call_deferred("change_points", points)
 	_play_animation("idle")
 
-func _physics_process(delta: float):
-	var move_direction = gravity
-	
+func _physics_process(delta: float):	
 	if push_point and global_position.distance_to(push_point) >= 5:
 		if move_and_collide(global_position.direction_to(push_point) * PUSH_SPEED * delta):
 			push_point = null
@@ -38,31 +46,37 @@ func _physics_process(delta: float):
 		return
 	elif push_point:
 		push_point = null
-	
+#calculate speeds
 	if Input.is_action_pressed("move_left"):
-		move_direction.x = -1
+		_speed_left = Vector2.LEFT * _speed_on_surface;
 		animated_sprite.flip_h = true
-	elif Input.is_action_pressed("move_right"):
-		move_direction.x = 1
+	if Input.is_action_pressed("move_right"):
+		_speed_right = Vector2.RIGHT * _speed_on_surface;
 		animated_sprite.flip_h = false
-
-	if Input.is_action_just_pressed("jump") and jump < 1:
-		jump += 1
-		jump_velocity = JUMP_STRENGTH
 		
-	if is_on_floor():
-		jump = 0
-		
-	if jump_velocity < 0.0:
-		jump_velocity += gravity.y * delta * 4
-		move_direction.y = jump_velocity
+	if Input.is_action_just_released("move_left"):
+		_speed_left = Vector2.ZERO
+	if Input.is_action_just_released("move_right"):
+		_speed_right = Vector2.ZERO
 	
-	if move_direction.y > 0 and ray_cast_down.is_colliding():
+	if is_on_floor():
+		if Input.is_action_just_pressed("jump"):
+			_speed_in_air = Vector2.UP * force_jump
+		else:
+			_speed_in_air = Vector2.ZERO
+	elif is_on_ceiling():
+		_speed_in_air.y = max(_speed_in_air.y, 0)
+	
+	_speed_in_air += acc_gravity
+	_speed_total = _speed_left + _speed_right + _speed_in_air
+	
+	_play_move_animation(_speed_total)
+	move_and_slide(_speed_total, Vector2.UP)
+	
+	if _speed_total.y > 0 and ray_cast_down.is_colliding():
 		var enemy = ray_cast_down.get_collider()
 		hit_enemy(enemy)
 	
-	_play_move_animation(move_direction)
-	move_and_slide(move_direction * speed, Vector2.UP)
 	
 	if invulnerable_time >= 0:
 		invulnerable_time -= delta
